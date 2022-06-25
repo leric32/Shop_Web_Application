@@ -1,0 +1,15 @@
+pip==21.1.2
+wheel==0.36.2
+setuptools==57.0.0
+PyMySql==1.0.2
+Flask==1.1.2
+flask_sqlalchemy==2.5.1
+sqlalchemy < 1.4.0
+flask_migrate==2.7.0
+flask_script==2.0.5
+sqlalchemy_utils==0.36.8
+flask_jwt_extended==4.1.0
+Werkzeug~=2.0.0
+cryptography==3.4.7
+jinja2<3.1.0
+itsdangerous==2.0.1

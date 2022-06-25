@@ -1,0 +1,121 @@
+version: '3'
+
+services:
+  authenticationDB:
+    image: mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      timeout: 10s
+      retries: 10
+    networks:
+      - authnet
+    volumes:
+      - dataAuthentication:/var/lib/mysql
+  authenticationMigration:
+    image: authenticationmigration
+    environment:
+      - DATABASE_URL=authenticationDB
+    networks:
+      - authnet
+  authentication:
+    image: authentication
+    environment:
+      - DATABASE_URL=authenticationDB
+    ports:
+      - 5000:5000
+    networks:
+      - authnet
+  adminer:
+    image: adminer
+    ports:
+      - 8080:8080
+    networks:
+      - authnet
+      - adminnet
+  applicationsDB:
+    image: mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      timeout: 10s
+      retries: 10
+    networks:
+      - adminnet
+      - proddaemonnet
+      - customernet
+    volumes:
+      - dataApplications:/var/lib/mysql
+  applicationsMigration:
+    image: applicationsmigration
+    environment:
+      - DATABASE_URL=applicationsDB
+    networks:
+      - adminnet
+  redis:
+    image: redis
+    ports:
+      - 6379:6379
+    networks:
+      - warehousenet
+      - daemonnet
+  admin:
+    image: adminimage
+    ports:
+      - 5003:5003
+    environment:
+      - DATABASE_URL=applicationsDB
+      - REDIS_HOST=redis
+    networks:
+      - adminnet
+  customer:
+    image: customerimage
+    ports:
+      - 5002:5002
+    environment:
+      - DATABASE_URL=applicationsDB
+      - REDIS_HOST=redis
+    networks:
+      - customernet
+    deploy:
+      replicas: 3
+  warehouse:
+    image: warehouseimage
+    ports:
+      - 5001:5001
+    environment:
+      - DATABASE_URL=applicationsDB
+      - REDIS_HOST=redis
+    networks:
+      - warehousenet
+    deploy:
+      replicas: 3
+  daemon:
+    image: daemonimage
+    environment:
+      - DATABASE_URL=applicationsDB
+      - REDIS_HOST=redis
+    networks:
+      - daemonnet
+      - proddaemonnet
+
+volumes:
+  dataAuthentication:
+  dataApplications:
+networks:
+  authnet:
+    driver: overlay
+  warehousenet:
+    driver: overlay
+  daemonnet:
+    driver: overlay
+  proddaemonnet:
+    driver: overlay
+  adminnet:
+    driver: overlay
+  customernet:
+    driver: overlay
+
+

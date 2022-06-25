@@ -1,0 +1,8 @@
+python main.py --type all --with-authentication --authentication-address http://127.0.0.1:5000 --warehouse-address http://127.0.0.1:5001 --customer-address http://127.0.0.1:5002 --administrator-address http://127.0.0.1:5003 --jwt-secret JWT_SECRET_KEY --roles-field roles --warehouse-role warehouse --customer-role customer --administrator-role admin
+
+
+docker swarm init --advertise-addr 127.0.0.1
+
+docker stack deploy --compose-file stack.yaml myappstack
+
+docker swarm leave --force
